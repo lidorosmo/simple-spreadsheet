@@ -1,0 +1,18 @@
+.sheet-view-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sheet-row {
+    display: flex;
+    justify-content: space-around;
+    align-content: center;
+  }
+  
+  .sheet-cell {
+    /* border: 1px solid black; */
+    padding: 0.5em;
+    text-align: center;
+    
+  }
+  

@@ -1,23 +1,59 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import SheetView from "./components/SheetView/SheetView";
+import SheetList from "./components/SheetList/SheetList";
 
 function App() {
+  const [data, setData] = useState({});
+  const [selectedSheet, setSelectedSheet] = useState(null);
+  const [sheets, setSheets] = useState([]);
+
+  useEffect(() => {
+    fetch(
+      "https://clinch-public-documents.s3.amazonaws.com/clinch-recruitment/spreadsheet.json"
+    )
+      .then((response) => response.text()) // The reponse is text
+      .then((responseText) => {
+        const fetchedData = JSON.parse(JSON.parse(responseText));
+        setData(fetchedData);
+        // setData(
+        //   Object.fromEntries(
+        //     Object.entries(fetchedData).map(([sheetName, sheetData]) => [
+        //       sheetName,
+        //       sheetData.map((row) => [...row, row.reduce((a, b) => a + b, 0)]),
+        //     ])
+        //   )
+        // );
+        setSheets(Object.keys(fetchedData));
+        // console.log("fetched:", fetchedData);
+      })
+      .catch((error) => console.error(error));
+  }, []);
+
+  const handleSheetSelection = (sheet) => {
+    setSelectedSheet(sheet);
+  };
+  const handleSheetListChange = (newList) => {
+    setSheets(newList);
+  };
+  const handleSheetViewChange = (newSheetData) => {
+    const oldData = data;
+    // console.log(newSheetData);
+    oldData[selectedSheet] = newSheetData;
+    console.log("data:", data, "\n newdata:", oldData);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <SheetList
+        sheets={sheets}
+        onSelectSheet={handleSheetSelection}
+        onListChange={handleSheetListChange}
+      />
+      <SheetView
+        sheet={selectedSheet}
+        data={data[selectedSheet] ?? []}
+        onSheetReorder={handleSheetViewChange}
+      />
     </div>
   );
 }
